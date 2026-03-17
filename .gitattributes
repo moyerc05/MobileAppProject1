@@ -1,0 +1,8 @@
+# Default behavior
+* text=auto
+
+# Keep Windows line endings for .bat files
+*.bat text eol=crlf
+
+# Shell scripts use LF
+*.sh text eol=lf

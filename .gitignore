@@ -1,0 +1,15 @@
+.DS_Store
+.gradle/
+build/
+**/build/
+local.properties
+.idea/
+*.iml
+*.iws
+*.ipr
+*.class
+out/
+*.log
+**/iosApp/build/
+**/androidApp/build/
+**/shared/build/
