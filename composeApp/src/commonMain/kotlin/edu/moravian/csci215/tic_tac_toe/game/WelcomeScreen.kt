@@ -1,5 +1,6 @@
 package edu.moravian.csci215.tic_tac_toe
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -11,7 +12,9 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import kotlinx.coroutines.launch
-
+import org.jetbrains.compose.resources.painterResource
+import tictactoe.composeapp.generated.resources.Res
+import tictactoe.composeapp.generated.resources.*
 /**
  * Represents the possible player types that can be selected
  * on the welcome screen.
@@ -24,18 +27,7 @@ enum class PlayerType {
 }
 
 // A list of default names to pull from when the screen loads
-val defaultNames = listOf(
-    "Alice",
-    "Bob",
-    "Charlie",
-    "Diana",
-    "Eve",
-    "Frank",
-    "Grace",
-    "Hank",
-    "Ivy",
-    "Jack",
-    "Karen",
+val defaultNames = listOf("Alice", "Bob", "Charlie", "Diana", "Eve", "Frank", "Grace", "Hank", "Ivy", "Jack", "Karen",
     "Leo",
 )
 
@@ -77,9 +69,11 @@ fun WelcomeScreen(
                 horizontalAlignment = Alignment.CenterHorizontally,
             ) {
                 // Shrink top spacing in landscape
-                // Spacer(modifier = Modifier.height(if (isLandscape) 8.dp else 32.dp))
-
-                TitleSection()
+                //Spacer(modifier = Modifier.height(if (isLandscape) 8.dp else 32.dp))
+                if (!isLandscape) {
+                    Spacer(modifier = Modifier.height(48.dp)) // Increase this to push it down further
+                }
+                TitleSection(isLandscape = isLandscape)
 
                 // Drastically reduce this spacer in landscape mode
                 Spacer(modifier = Modifier.height(if (isLandscape) 24.dp else 200.dp))
@@ -130,18 +124,32 @@ fun WelcomeScreen(
 }
 
 @Composable
-fun TitleSection() {
-    Text(
-        text = "Welcome to Tic-Tac-Toe!",
-        style = MaterialTheme.typography.headlineLarge.copy(
-            fontSize = 50.sp,
-            lineHeight = 70.sp,
-        ),
-        textAlign = TextAlign.Center,
-        modifier = Modifier.fillMaxWidth(),
-    )
-}
+fun TitleSection(isLandscape: Boolean) {
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally,
+        modifier = Modifier.fillMaxWidth()
+    ) {
+        // Portrays landscape
+        if (!isLandscape) {
+            Image(
+                painter = painterResource(resource = Res.drawable.tictactoe),
+                contentDescription = "Tic-Tac-Toe App Logo",
+                modifier = Modifier.size(120.dp) // Adjust this size as needed
+            )
 
+            Spacer(modifier = Modifier.height(16.dp))
+        }
+        Text(
+            text = "Welcome to Tic-Tac-Toe!",
+            style = MaterialTheme.typography.headlineLarge.copy(
+                fontSize = 50.sp,
+                lineHeight = 70.sp,
+            ),
+            textAlign = TextAlign.Center,
+            modifier = Modifier.fillMaxWidth(),
+        )
+    }
+}
 @Composable
 fun PlayerSetupColumn(
     modifier: Modifier = Modifier,
