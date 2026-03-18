@@ -39,7 +39,7 @@ kotlin {
             implementation(libs.compose.uiToolingPreview)
             implementation(libs.androidx.lifecycle.viewmodelCompose)
             implementation(libs.androidx.lifecycle.runtimeCompose)
-            implementation(libs.navigation.compose)
+            implementation("org.jetbrains.androidx.navigation:navigation-compose:2.8.0-alpha08")
         }
         commonTest.dependencies {
             implementation(libs.kotlin.test)
