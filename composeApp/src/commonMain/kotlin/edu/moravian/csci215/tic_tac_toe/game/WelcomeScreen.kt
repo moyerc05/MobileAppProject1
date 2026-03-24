@@ -53,7 +53,6 @@ fun WelcomeScreen(
         snackbarHost = { SnackbarHost(snackbarHostState) },
     ) { paddingValues ->
 
-        // All of this spacing needs to be heavily refactored
         BoxWithConstraints(
             modifier = Modifier
                 .fillMaxSize()
@@ -68,10 +67,9 @@ fun WelcomeScreen(
                     .verticalScroll(rememberScrollState()),
                 horizontalAlignment = Alignment.CenterHorizontally,
             ) {
-                // Shrink top spacing in landscape
-                //Spacer(modifier = Modifier.height(if (isLandscape) 8.dp else 32.dp))
+                //Check
                 if (!isLandscape) {
-                    Spacer(modifier = Modifier.height(48.dp)) // Increase this to push it down further
+                    Spacer(modifier = Modifier.height(48.dp))
                 }
                 TitleSection(isLandscape = isLandscape)
 
@@ -101,8 +99,7 @@ fun WelcomeScreen(
                     )
                 }
 
-                // Shrink bottom spacing in landscape
-                // Might have to rework this when we add a logo
+                //Shrinking bottom when turned to landscape
                 Spacer(modifier = Modifier.height(if (isLandscape) 16.dp else 32.dp))
 
                 StartGameButton(
@@ -129,7 +126,7 @@ fun TitleSection(isLandscape: Boolean) {
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = Modifier.fillMaxWidth()
     ) {
-        // Portrays landscape
+        //Imaging
         if (!isLandscape) {
             Image(
                 painter = painterResource(resource = Res.drawable.tictactoe),
