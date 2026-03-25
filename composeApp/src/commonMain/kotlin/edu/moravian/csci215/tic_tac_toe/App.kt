@@ -7,8 +7,20 @@ import androidx.compose.ui.Modifier
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.toRoute
 import edu.moravian.csci215.tic_tac_toe.game.AppTheme
+import kotlinx.serialization.Serializable
 
+@Serializable
+object WelcomeRoute
+
+@Serializable
+data class GameRoute(
+    val p1Name: String,
+    val p2Name: String,
+    val p1Type: PlayerType,
+    val p2Type: PlayerType
+)
 @Composable
 fun App() {
     AppTheme {
@@ -17,36 +29,28 @@ fun App() {
             color = MaterialTheme.colorScheme.background,
         ) {
             val navController = rememberNavController()
-            NavHost(navController = navController, startDestination = "welcome") {
+
+            // Use the Route object for the start destination
+            NavHost(navController = navController, startDestination = WelcomeRoute) {
+
                 // The Welcome Screen
-                composable("welcome") {
+                composable<WelcomeRoute> {
                     WelcomeScreen(
                         onStartGame = { p1Name, p2Name, p1Type, p2Type ->
-                            // When the user clicks Start, navigate to the game route
-                            // We convert the Enums to Strings using .name so they fit in the route
-                            navController.navigate("game/$p1Name/$p2Name/${p1Type.name}/${p2Type.name}")
+                            navController.navigate(GameRoute(p1Name, p2Name, p1Type, p2Type))
                         },
                     )
                 }
 
-                composable("game/{p1Name}/{p2Name}/{p1Type}/{p2Type}") { backStackEntry ->
+                // The Game Screen
+                composable<GameRoute> { backStackEntry ->
+                    val route = backStackEntry.toRoute<GameRoute>()
 
-                    // Extract the strings from the navigation route
-                    val p1Name = backStackEntry.arguments?.getString("p1Name") ?: "Player 1"
-                    val p2Name = backStackEntry.arguments?.getString("p2Name") ?: "Player 2"
-                    val p1TypeString = backStackEntry.arguments?.getString("p1Type") ?: "HUMAN"
-                    val p2TypeString = backStackEntry.arguments?.getString("p2Type") ?: "HUMAN"
-
-                    // Convert the strings back into PlayerType Enums
-                    val p1Type = PlayerType.valueOf(p1TypeString)
-                    val p2Type = PlayerType.valueOf(p2TypeString)
-
-                    // Pass the extracted data into the actual GameScreen
                     GameScreen(
-                        p1Name,
-                        p2Name,
-                        p1Type,
-                        p2Type,
+                        p1Name = route.p1Name,
+                        p2Name = route.p2Name,
+                        p1Type = route.p1Type,
+                        p2Type = route.p2Type,
                         onNavigateBack = { navController.popBackStack() },
                     )
                 }
