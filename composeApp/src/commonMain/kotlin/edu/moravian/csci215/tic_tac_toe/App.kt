@@ -28,6 +28,10 @@ import edu.moravian.csci215.tic_tac_toe.game.GameOverScreen
 import edu.moravian.csci215.tic_tac_toe.game.GameScreen
 import kotlinx.coroutines.launch
 import kotlinx.serialization.Serializable
+import org.jetbrains.compose.resources.stringResource
+import tictactoe.composeapp.generated.resources.Res
+import tictactoe.composeapp.generated.resources.gameover_Text
+import tictactoe.composeapp.generated.resources.topBarNavText
 
 @Serializable
 object WelcomeRoute
@@ -74,9 +78,9 @@ fun App() {
                     TopAppBar(
                         title = {
                             if (currentDestination?.hasRoute<GameOverRoute>() == true) {
-                                Text("Game Over")
+                                Text(stringResource(Res.string.gameover_Text))
                             } else {
-                                Text("Game")
+                                Text(stringResource(Res.string.topBarNavText))
                             }
                         },
                         navigationIcon = {

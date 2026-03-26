@@ -8,6 +8,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import edu.moravian.csci215.tic_tac_toe.GameOverRoute
+import org.jetbrains.compose.resources.stringResource
+import tictactoe.composeapp.generated.resources.Res
+import tictactoe.composeapp.generated.resources.numTiesDisplay
+import tictactoe.composeapp.generated.resources.playAgainButton
 
 @Composable
 fun GameOverScreen(
@@ -44,7 +48,7 @@ fun GameOverScreen(
             Column(modifier = Modifier.padding(16.dp)) {
                 ScoreRow(route.p1Name, p1Wins)
                 ScoreRow(route.p2Name, p2Wins)
-                ScoreRow("Ties", ties)
+                ScoreRow(stringResource(Res.string.numTiesDisplay), ties)
             }
         }
 
@@ -54,7 +58,7 @@ fun GameOverScreen(
             onClick = onPlayAgain,
             modifier = Modifier.fillMaxWidth().height(56.dp)
         ) {
-            Text("Play Again", fontSize = 20.sp)
+            Text(stringResource(Res.string.playAgainButton), fontSize = 20.sp)
         }
     }
 }

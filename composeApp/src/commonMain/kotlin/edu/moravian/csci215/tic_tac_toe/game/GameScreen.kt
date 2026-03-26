@@ -13,6 +13,7 @@ import edu.moravian.csci215.tic_tac_toe.PlayerType
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.painterResource
+import org.jetbrains.compose.resources.stringResource
 import tictactoe.composeapp.generated.resources.Res
 import tictactoe.composeapp.generated.resources.*
 
@@ -39,6 +40,8 @@ fun GameScreen(
 
     var board by remember { mutableStateOf(Board()) }
     var isAiThinking by remember { mutableStateOf(false) }
+    val waitForAIMsg = stringResource(Res.string.waitForAIMove)
+    val spotTakenMsg = stringResource(Res.string.boardSpotTaken)
 
     val currentPlayerName =
         if (board.turn == 'X') p1Name else p2Name
@@ -55,12 +58,13 @@ fun GameScreen(
 
         GameBoard(
             board = board,
-            modifier = Modifier.fillMaxWidth(0.9f), // Scaled to 90% of screen width
+            modifier = Modifier
+                .weight(1f), // Takes up available vertical space without overflowing
             onCellClick = { r, c ->
 
                 if (isAiThinking) {
                     coroutineScope.launch {
-                        showSnackbar("Wait for AI move!")
+                        showSnackbar(waitForAIMsg)
                     }
                     return@GameBoard
                 }
@@ -69,7 +73,7 @@ fun GameScreen(
 
                 if (newBoard == null) {
                     coroutineScope.launch {
-                        showSnackbar("Spot already taken!")
+                        showSnackbar(spotTakenMsg)
                     }
                 } else {
                     board = newBoard
@@ -136,7 +140,7 @@ fun GameBoard(
         // Background board image
         Image(
             painter = painterResource(resource = Res.drawable.board),
-            contentDescription = "Tic Tac Toe Board",
+            contentDescription = stringResource(Res.string.gameBoardTitleDesc),
             modifier = Modifier.matchParentSize(),
             contentScale = ContentScale.FillBounds
         )
@@ -186,13 +190,13 @@ fun BoardCell(
         when (value) {
             'X' -> Image(
                 painter = painterResource(Res.drawable.x),
-                contentDescription = "X",
+                contentDescription = stringResource(Res.string.PlayerX),
                 modifier = Modifier.fillMaxSize(0.7f) // Scales the X to take up 70% of the cell
             )
 
             'O' -> Image(
                 painter = painterResource(Res.drawable.o),
-                contentDescription = "O",
+                contentDescription = stringResource(Res.string.PlayerO),
                 modifier = Modifier.fillMaxSize(0.7f) // Scales the O to take up 70% of the cell
             )
         }

@@ -13,6 +13,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.painterResource
+import org.jetbrains.compose.resources.stringResource
 import tictactoe.composeapp.generated.resources.Res
 import tictactoe.composeapp.generated.resources.*
 /**
@@ -45,6 +46,7 @@ fun WelcomeScreen(
     var player2Type by remember { mutableStateOf(PlayerType.HUMAN) }
 
     val coroutineScope = rememberCoroutineScope()
+    val emptyNameSnackbarError = stringResource(Res.string.emptyNameSnackbarError)
 
     BoxWithConstraints(
         modifier = Modifier
@@ -73,7 +75,7 @@ fun WelcomeScreen(
             ) {
                 PlayerSetupColumn(
                     modifier = Modifier.weight(1f),
-                    playerLabel = "Player 1",
+                    playerLabel = stringResource(Res.string.playerOneLabel),
                     playerName = player1Name,
                     onNameChange = { player1Name = it },
                     playerType = player1Type,
@@ -82,7 +84,7 @@ fun WelcomeScreen(
 
                 PlayerSetupColumn(
                     modifier = Modifier.weight(1f),
-                    playerLabel = "Player 2",
+                    playerLabel = stringResource(Res.string.playerTwoLabel),
                     playerName = player2Name,
                     onNameChange = { player2Name = it },
                     playerType = player2Type,
@@ -96,7 +98,7 @@ fun WelcomeScreen(
                 onStartClick = {
                     if (player1Name.isBlank() || player2Name.isBlank()) {
                         coroutineScope.launch {
-                            showSnackbar("Player names cannot be empty!")
+                            showSnackbar(emptyNameSnackbarError)
                         }
                     } else {
                         onStartGame(player1Name, player2Name, player1Type, player2Type)
@@ -117,14 +119,14 @@ fun TitleSection(isLandscape: Boolean) {
         if (!isLandscape) {
             Image(
                 painter = painterResource(resource = Res.drawable.tictactoe),
-                contentDescription = "Tic-Tac-Toe App Logo",
+                contentDescription = stringResource(Res.string.titleLogoDesc),
                 modifier = Modifier.size(120.dp) // Adjust this size as needed
             )
 
             Spacer(modifier = Modifier.height(16.dp))
         }
         Text(
-            text = "Welcome to Tic-Tac-Toe!",
+            text = stringResource(Res.string.welcomeScreenTitle),
             style = MaterialTheme.typography.headlineLarge.copy(
                 fontSize = 50.sp,
                 lineHeight = 70.sp,
@@ -164,7 +166,7 @@ fun PlayerSetupColumn(
         OutlinedTextField(
             value = playerName,
             onValueChange = onNameChange,
-            label = { Text("Name") },
+            label = { Text(stringResource(Res.string.nameSpaceWelcomeScreen)) },
             modifier = Modifier.fillMaxWidth(),
         )
     }
@@ -211,7 +213,7 @@ fun StartGameButton(onStartClick: () -> Unit) {
             .height(50.dp),
     ) {
         Text(
-            "Start!",
+            stringResource(Res.string.startGameButton),
             style = MaterialTheme.typography.titleLarge.copy(
                 fontSize = 25.sp,
             ),

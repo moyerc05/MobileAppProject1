@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+    <string name="gameover_Text">Game Over</string>
+    <string name="topBarNavText">Game</string>
+    <string name="PlayerX">X</string>
+    <string name="PlayerO">O</string>
+    <string name="waitForAIMove">Wait for AI move!</string>
+    <string name="boardSpotTaken">Spot already taken!</string>
+    <string name="gameBoardTitleDesc">Tic Tac Toe Board</string>
+    <string name="playerOneLabel">Player 1</string>
+    <string name="playerTwoLabel">Player 2</string>
+    <string name="emptyNameSnackbarError">Player names cannot be empty!</string>
+    <string name="titleLogoDesc">Tic-Tac-Toe App Logo</string>
+    <string name="welcomeScreenTitle">Welcome to Tic-Tac-Toe!</string>
+    <string name="nameSpaceWelcomeScreen">Name</string>
+    <string name="startGameButton">Start!</string>
+    <string name="numTiesDisplay">Ties</string>
+    <string name="playAgainButton">Play Again</string>
+
+
+</resources>
