@@ -6,6 +6,7 @@ plugins {
     alias(libs.plugins.androidApplication)
     alias(libs.plugins.composeMultiplatform)
     alias(libs.plugins.composeCompiler)
+    id("org.jetbrains.kotlin.plugin.serialization") version "2.3.20" // Use your actual Kotlin version here
 }
 
 kotlin {
@@ -40,6 +41,9 @@ kotlin {
             implementation(libs.androidx.lifecycle.viewmodelCompose)
             implementation(libs.androidx.lifecycle.runtimeCompose)
             implementation("org.jetbrains.androidx.navigation:navigation-compose:2.8.0-alpha08")
+            implementation("org.jetbrains.androidx.navigation:navigation-compose:2.8.0-alpha08")
+            implementation("androidx.navigation:navigation-compose:2.8.0") // Or newer
+            implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.3")
         }
         commonTest.dependencies {
             implementation(libs.kotlin.test)

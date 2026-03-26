@@ -34,88 +34,75 @@ val defaultNames = listOf("Alice", "Bob", "Charlie", "Diana", "Eve", "Frank", "G
 @Composable
 fun WelcomeScreen(
     onStartGame: (String, String, PlayerType, PlayerType) -> Unit,
+    showSnackbar: (String) -> Unit,
 ) {
-    // 1. Grab two unique, random names ONCE when the screen first loads
     val initialNames = remember { defaultNames.shuffled().take(2) }
 
-    // UI state
     var player1Name by remember { mutableStateOf(initialNames[0]) }
     var player2Name by remember { mutableStateOf(initialNames[1]) }
 
     var player1Type by remember { mutableStateOf(PlayerType.HUMAN) }
     var player2Type by remember { mutableStateOf(PlayerType.HUMAN) }
 
-    // Snackbar and Coroutine state for validation messages
-    val snackbarHostState = remember { SnackbarHostState() }
     val coroutineScope = rememberCoroutineScope()
 
-    Scaffold(
-        snackbarHost = { SnackbarHost(snackbarHostState) },
-    ) { paddingValues ->
+    BoxWithConstraints(
+        modifier = Modifier
+            .fillMaxSize()
+    ) {
+        val isLandscape = maxWidth > maxHeight
 
-        BoxWithConstraints(
+        Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(paddingValues),
+                .padding(24.dp)
+                .verticalScroll(rememberScrollState()),
+            horizontalAlignment = Alignment.CenterHorizontally,
         ) {
-            val isLandscape = maxWidth > maxHeight
+            if (!isLandscape) {
+                Spacer(modifier = Modifier.height(48.dp))
+            }
 
-            Column(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(24.dp)
-                    .verticalScroll(rememberScrollState()),
-                horizontalAlignment = Alignment.CenterHorizontally,
+            TitleSection(isLandscape)
+
+            Spacer(modifier = Modifier.height(if (isLandscape) 24.dp else 200.dp))
+
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(16.dp),
             ) {
-                //Check
-                if (!isLandscape) {
-                    Spacer(modifier = Modifier.height(48.dp))
-                }
-                TitleSection(isLandscape = isLandscape)
+                PlayerSetupColumn(
+                    modifier = Modifier.weight(1f),
+                    playerLabel = "Player 1",
+                    playerName = player1Name,
+                    onNameChange = { player1Name = it },
+                    playerType = player1Type,
+                    onTypeChange = { player1Type = it },
+                )
 
-                // Drastically reduce this spacer in landscape mode
-                Spacer(modifier = Modifier.height(if (isLandscape) 24.dp else 200.dp))
-
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(16.dp),
-                ) {
-                    PlayerSetupColumn(
-                        modifier = Modifier.weight(1f),
-                        playerLabel = "Player 1",
-                        playerName = player1Name,
-                        onNameChange = { player1Name = it },
-                        playerType = player1Type,
-                        onTypeChange = { player1Type = it },
-                    )
-
-                    PlayerSetupColumn(
-                        modifier = Modifier.weight(1f),
-                        playerLabel = "Player 2",
-                        playerName = player2Name,
-                        onNameChange = { player2Name = it },
-                        playerType = player2Type,
-                        onTypeChange = { player2Type = it },
-                    )
-                }
-
-                //Shrinking bottom when turned to landscape
-                Spacer(modifier = Modifier.height(if (isLandscape) 16.dp else 32.dp))
-
-                StartGameButton(
-                    onStartClick = {
-                        // Validation Logic
-                        if (player1Name.isBlank() || player2Name.isBlank()) {
-                            coroutineScope.launch {
-                                snackbarHostState.showSnackbar("Player names cannot be empty!")
-                            }
-                        } else {
-                            // Trigger navigation callback
-                            onStartGame(player1Name, player2Name, player1Type, player2Type)
-                        }
-                    },
+                PlayerSetupColumn(
+                    modifier = Modifier.weight(1f),
+                    playerLabel = "Player 2",
+                    playerName = player2Name,
+                    onNameChange = { player2Name = it },
+                    playerType = player2Type,
+                    onTypeChange = { player2Type = it },
                 )
             }
+
+            Spacer(modifier = Modifier.height(if (isLandscape) 16.dp else 32.dp))
+
+            StartGameButton(
+                onStartClick = {
+                    if (player1Name.isBlank() || player2Name.isBlank()) {
+                        coroutineScope.launch {
+                            showSnackbar("Player names cannot be empty!")
+                        }
+                    } else {
+                        onStartGame(player1Name, player2Name, player1Type, player2Type)
+                    }
+                },
+            )
         }
     }
 }

@@ -1,92 +1,202 @@
-package edu.moravian.csci215.tic_tac_toe
+package edu.moravian.csci215.tic_tac_toe.game
 
 import androidx.compose.foundation.layout.*
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedButton
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
+import edu.moravian.csci215.tic_tac_toe.PlayerType
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
+import androidx.compose.foundation.Image
+import androidx.compose.ui.layout.ContentScale
+import org.jetbrains.compose.resources.painterResource
+import tictactoe.composeapp.generated.resources.Res
+import tictactoe.composeapp.generated.resources.*
+import androidx.compose.foundation.clickable
+import org.jetbrains.compose.resources.stringResource
 
-// This code is almost entirely AI and acts as a placeholder to show that we're even
-// moving in navigation.
-
+/**
+ * Main gameplay screen. This handles:
+ *
+ * Board rendering
+ * Player turns
+ * AI delays
+ * Error handling via snackbar
+ */
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun GameScreen(
     p1Name: String,
     p2Name: String,
     p1Type: PlayerType,
     p2Type: PlayerType,
-    onNavigateBack: () -> Unit, // Callback to trigger the back navigation
+    showSnackbar: (String) -> Unit,
 ) {
-    // This Box centers everything on the screen
-    Box(
-        modifier = Modifier.fillMaxSize(),
-        contentAlignment = Alignment.Center,
+    val coroutineScope = rememberCoroutineScope()
+
+    var board by remember { mutableStateOf(Board()) }
+    var isAiThinking by remember { mutableStateOf(false) }
+
+    val currentPlayerName =
+        if (board.turn == 'X') p1Name else p2Name
+
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .safeContentPadding(),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.SpaceEvenly
     ) {
-        Column(
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center,
-            modifier = Modifier.padding(16.dp),
-        ) {
-            // --- BACK BUTTON ---
-            // We use align(Alignment.Start) to push it to the left side of the Column
-            OutlinedButton(
-                onClick = onNavigateBack,
-                modifier = Modifier.align(Alignment.Start),
-            ) {
-                Text("< Back to Setup")
+
+        CurrentPlayerText(currentPlayerName, board.turn)
+
+        GameBoard(
+            board = board,
+            onCellClick = { r, c ->
+
+                if (isAiThinking) {
+                    coroutineScope.launch {
+                        showSnackbar("Wait for AI move!")
+                    }
+                    return@GameBoard
+                }
+
+                val newBoard = board.playPiece(r, c)
+
+                if (newBoard == null) {
+                    coroutineScope.launch {
+                        showSnackbar("Spot already taken!")
+                    }
+                } else {
+                    board = newBoard
+                }
+            }
+        )
+    }
+
+    // AI LOGIC
+    LaunchedEffect(board) {
+        val currentType =
+            if (board.turn == 'X') p1Type else p2Type
+
+        if (currentType != PlayerType.HUMAN && !board.isGameOver) {
+
+            isAiThinking = true
+            delay(800)
+
+            val ai: AIPlayer = when (currentType) {
+                PlayerType.EASY_AI -> EasyAIPlayer()
+                PlayerType.MEDIUM_AI -> MediumAIPlayer()
+                PlayerType.HARD_AI -> HardAIPlayer()
+                else -> return@LaunchedEffect
             }
 
-            Spacer(modifier = Modifier.height(24.dp))
+            val (r, c) = ai.findMove(board, board.turn)
 
-            // 1. The Matchup Header
-            Text(
-                text = "Matchup",
-                style = MaterialTheme.typography.headlineMedium,
-                fontWeight = FontWeight.Bold,
+            board = board.playPiece(r, c) ?: board
+
+            isAiThinking = false
+        }
+    }
+}
+
+/**
+ * Displays the 3x3 tic-tac-toe board.
+ */
+@Composable
+fun GameBoard(
+    board: Board,
+    onCellClick: (Int, Int) -> Unit,
+) {
+    Box(
+        modifier = Modifier.size(400.dp),
+        contentAlignment = Alignment.Center
+    ) {
+
+        // Background board image
+        Image(
+            painter = painterResource(resource = Res.drawable.board),
+            contentDescription = "Tic Tac Toe Board",
+            modifier = Modifier.matchParentSize(),
+            contentScale = ContentScale.FillBounds
+        )
+
+        // Overlay clickable grid
+        Column(
+            verticalArrangement = Arrangement.SpaceBetween,
+            modifier = Modifier
+                .fillMaxHeight()
+                .padding(vertical = 15.dp)
+        ){
+            for (r in 0..2) {
+                Row(
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    modifier = Modifier.fillMaxWidth()
+                ){
+                    for (c in 0..2) {
+                        BoardCell(
+                            value = board[r, c],
+                            onClick = { onCellClick(r, c) }
+                        )
+                    }
+                }
+            }
+        }
+    }
+}
+
+/**
+ * A single cell in the tic-tac-toe grid.
+ */
+@Composable
+fun BoardCell(
+    value: Char,
+    onClick: () -> Unit,
+) {
+    Box(
+        modifier = Modifier
+            .size(110.dp)
+            .padding(4.dp)
+            .clickable(onClick = onClick),
+        contentAlignment = Alignment.Center
+    ) {
+        when (value) {
+            'X' -> Image(
+                painter = painterResource(Res.drawable.x),
+                contentDescription = "X",
+                modifier = Modifier.size(70.dp)
             )
 
-            Spacer(modifier = Modifier.height(8.dp))
-
-            Text(
-                text = "$p1Name (${p1Type.name.replace("_", " ")})",
-                fontSize = 20.sp,
-                color = MaterialTheme.colorScheme.primary,
-            )
-
-            Text(
-                text = "VS",
-                fontSize = 16.sp,
-                fontWeight = FontWeight.Bold,
-                modifier = Modifier.padding(vertical = 4.dp),
-            )
-
-            Text(
-                text = "$p2Name (${p2Type.name.replace("_", " ")})",
-                fontSize = 20.sp,
-                color = MaterialTheme.colorScheme.secondary,
-            )
-
-            Spacer(modifier = Modifier.height(48.dp))
-
-            // 2. Placeholder for the Board
-            Text(
-                text = "[ Tic-Tac-Toe Board Goes Here ]",
-                fontSize = 24.sp,
-                fontWeight = FontWeight.Light,
-            )
-
-            Spacer(modifier = Modifier.height(48.dp))
-
-            // 3. Placeholder for Game Status/Controls
-            Text(
-                text = "Waiting for game to start...",
-                fontSize = 18.sp,
+            'O' -> Image(
+                painter = painterResource(Res.drawable.o),
+                contentDescription = "O",
+                modifier = Modifier.size(70.dp)
             )
         }
     }
 }
+
+/**
+ * Displays whose turn it is.
+ */
+@Composable
+fun CurrentPlayerText(
+    name: String,
+    piece: Char
+) {
+    Text(
+        text = "$name's turn ($piece)",
+        style = MaterialTheme.typography.headlineMedium
+    )
+}
+
+/*
+Things to do:
+- String resources for all text
+- Icons for back button
+- Background of OS status bars (top and bottom) should be app's primary color
+- Connection to GameOverScreen after navigation is set up
+- Fix scaffold situation (only one scaffold in app)
+ */
