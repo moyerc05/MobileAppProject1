@@ -16,6 +16,7 @@ import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 import tictactoe.composeapp.generated.resources.Res
 import tictactoe.composeapp.generated.resources.*
+
 /**
  * Represents the possible player types that can be selected
  * on the welcome screen.
@@ -27,11 +28,31 @@ enum class PlayerType {
     HARD_AI,
 }
 
-// A list of default names to pull from when the screen loads
-val defaultNames = listOf("Alice", "Bob", "Charlie", "Diana", "Eve", "Frank", "Grace", "Hank", "Ivy", "Jack", "Karen",
+/**
+ * Default player names to randomly assign on first screen load.
+ */
+val defaultNames = listOf(
+    "Alice",
+    "Bob",
+    "Charlie",
+    "Diana",
+    "Eve",
+    "Frank",
+    "Grace",
+    "Hank",
+    "Ivy",
+    "Jack",
+    "Karen",
     "Leo",
 )
 
+/**
+ * Composable function for the Welcome screen.
+ * Allows the user to set player names and types before starting a game.
+ *
+ * @param onStartGame Callback invoked when the "Start Game" button is pressed.
+ * @param showSnackbar Callback to display temporary messages to the user.
+ */
 @Composable
 fun WelcomeScreen(
     onStartGame: (String, String, PlayerType, PlayerType) -> Unit,
@@ -109,6 +130,11 @@ fun WelcomeScreen(
     }
 }
 
+/**
+ * Displays the Welcome screen title and logo image.
+ *
+ * @param isLandscape Boolean indicating whether the device is in landscape mode.
+ */
 @Composable
 fun TitleSection(isLandscape: Boolean) {
     Column(
@@ -120,7 +146,7 @@ fun TitleSection(isLandscape: Boolean) {
             Image(
                 painter = painterResource(resource = Res.drawable.tictactoe),
                 contentDescription = stringResource(Res.string.titleLogoDesc),
-                modifier = Modifier.size(120.dp) // Adjust this size as needed
+                modifier = Modifier.size(120.dp)
             )
 
             Spacer(modifier = Modifier.height(16.dp))
@@ -136,6 +162,10 @@ fun TitleSection(isLandscape: Boolean) {
         )
     }
 }
+
+/**
+ * Displays UI for a single player's setup (name and type selection).
+ */
 @Composable
 fun PlayerSetupColumn(
     modifier: Modifier = Modifier,
@@ -172,6 +202,9 @@ fun PlayerSetupColumn(
     }
 }
 
+/**
+ * Dropdown menu to select a player's type (HUMAN or AI difficulty).
+ */
 @Composable
 fun PlayerTypeDropdown(
     selectedType: PlayerType,
@@ -204,6 +237,9 @@ fun PlayerTypeDropdown(
     }
 }
 
+/**
+ * Button to start the game with currently selected players.
+ */
 @Composable
 fun StartGameButton(onStartClick: () -> Unit) {
     Button(

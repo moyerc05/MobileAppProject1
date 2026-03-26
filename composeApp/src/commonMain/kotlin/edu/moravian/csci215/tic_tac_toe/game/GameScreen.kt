@@ -18,13 +18,17 @@ import tictactoe.composeapp.generated.resources.Res
 import tictactoe.composeapp.generated.resources.*
 
 /**
- * Main gameplay screen. This handles:
+ * Main gameplay screen.
  *
- * Board rendering
- * Player turns
- * AI delays
- * Error handling via snackbar
- * Triggering game over navigation
+ * Displays the current player's turn, the Tic-Tac-Toe board, and handles user input
+ * as well as AI moves. Handles game over detection.
+ *
+ * @param p1Name Name of player 1.
+ * @param p2Name Name of player 2.
+ * @param p1Type Type of player 1 (HUMAN or AI difficulty).
+ * @param p2Type Type of player 2 (HUMAN or AI difficulty).
+ * @param showSnackbar Callback to display temporary messages to the user.
+ * @param onGameOver Callback invoked when the game ends. Provides the winner ('X' or 'O') or null if tie, and final board state.
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -59,7 +63,7 @@ fun GameScreen(
         GameBoard(
             board = board,
             modifier = Modifier
-                .weight(1f), // Takes up available vertical space without overflowing
+                .weight(1f),
             onCellClick = { r, c ->
 
                 if (isAiThinking) {
@@ -124,38 +128,41 @@ fun GameScreen(
 }
 
 /**
- * Displays the 3x3 tic-tac-toe board.
+ * Composable that displays the Tic-Tac-Toe board.
+ *
+ * @param board The current board state.
+ * @param onCellClick Callback invoked when a specific cell is clicked, providing row and column.
+ * @param modifier Optional Compose modifier.
  */
 @Composable
 fun GameBoard(
     board: Board,
     onCellClick: (Int, Int) -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     Box(
         modifier = modifier.aspectRatio(1f), // Forces the board to always be a perfect square
-        contentAlignment = Alignment.Center
+        contentAlignment = Alignment.Center,
     ) {
-
         // Background board image
         Image(
             painter = painterResource(resource = Res.drawable.board),
             contentDescription = stringResource(Res.string.gameBoardTitleDesc),
             modifier = Modifier.matchParentSize(),
-            contentScale = ContentScale.FillBounds
+            contentScale = ContentScale.FillBounds,
         )
 
         // Overlay clickable grid
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(15.dp)
+                .padding(15.dp),
         ){
             for (r in 0..2) {
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .weight(1f) // Distributes row heights evenly
+                        .weight(1f), // Distributes row heights evenly
                 ){
                     for (c in 0..2) {
                         BoardCell(
@@ -163,7 +170,7 @@ fun GameBoard(
                             onClick = { onCellClick(r, c) },
                             modifier = Modifier
                                 .fillMaxHeight()
-                                .weight(1f) // Distributes column widths evenly
+                                .weight(1f), // Distributes column widths evenly
                         )
                     }
                 }
@@ -173,55 +180,53 @@ fun GameBoard(
 }
 
 /**
- * A single cell in the tic-tac-toe grid.
+ * A single cell in the Tic-Tac-Toe grid.
+ *
+ * @param value The current value of the cell ('X', 'O', or empty).
+ * @param onClick Callback invoked when the cell is clicked.
+ * @param modifier Optional Compose modifier.
  */
 @Composable
 fun BoardCell(
     value: Char,
     onClick: () -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     Box(
         modifier = modifier
             .padding(4.dp)
             .clickable(onClick = onClick),
-        contentAlignment = Alignment.Center
+        contentAlignment = Alignment.Center,
     ) {
         when (value) {
             'X' -> Image(
                 painter = painterResource(Res.drawable.x),
                 contentDescription = stringResource(Res.string.PlayerX),
-                modifier = Modifier.fillMaxSize(0.7f) // Scales the X to take up 70% of the cell
+                modifier = Modifier.fillMaxSize(0.7f), // Scales the X to take up 70% of the cell
             )
 
             'O' -> Image(
                 painter = painterResource(Res.drawable.o),
                 contentDescription = stringResource(Res.string.PlayerO),
-                modifier = Modifier.fillMaxSize(0.7f) // Scales the O to take up 70% of the cell
+                modifier = Modifier.fillMaxSize(0.7f), // Scales the O to take up 70% of the cell
             )
         }
     }
 }
 
 /**
- * Displays whose turn it is.
+ * Displays the name of the current player and their piece.
+ *
+ * @param name Name of the current player.
+ * @param piece Character representing the player's piece ('X' or 'O').
  */
 @Composable
 fun CurrentPlayerText(
     name: String,
-    piece: Char
+    piece: Char,
 ) {
     Text(
         text = "$name's turn ($piece)",
-        style = MaterialTheme.typography.headlineMedium
+        style = MaterialTheme.typography.headlineMedium,
     )
 }
-
-/*
-Things to do:
-- String resources for all text
-- Icons for back button
-- Background of OS status bars (top and bottom) should be app's primary color
-- Connection to GameOverScreen after navigation is set up
-- Fix scaffold situation (only one scaffold in app)
- */
