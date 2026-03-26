@@ -26,6 +26,7 @@ import edu.moravian.csci215.tic_tac_toe.game.AppTheme
 import edu.moravian.csci215.tic_tac_toe.game.Board.Companion.toStringRepresentation
 import edu.moravian.csci215.tic_tac_toe.game.GameOverScreen
 import edu.moravian.csci215.tic_tac_toe.game.GameScreen
+import edu.moravian.csci215.tic_tac_toe.game.PlatformBackButtonIcon
 import kotlinx.coroutines.launch
 import kotlinx.serialization.Serializable
 import org.jetbrains.compose.resources.stringResource
@@ -105,7 +106,8 @@ fun App() {
                                     navController.navigateUp()
                                 }
                             }) {
-                                Text("<") // simple back arrow
+                                // Dynamic custom PNG back button!
+                                PlatformBackButtonIcon()
                             }
                         }
                     )
@@ -121,11 +123,14 @@ fun App() {
 
                 // WELCOME SCREEN
                 composable<WelcomeRoute> {
+
+                    // Whenever the WelcomeScreen is shown, wipe the scores clean.
                     LaunchedEffect(Unit) {
                         p1Wins = 0
                         p2Wins = 0
                         ties = 0
                     }
+
                     WelcomeScreen(
                         onStartGame = { p1Name, p2Name, p1Type, p2Type ->
                             navController.navigate(
