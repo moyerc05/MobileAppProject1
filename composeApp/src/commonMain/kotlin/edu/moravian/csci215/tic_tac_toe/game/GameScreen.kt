@@ -1,21 +1,20 @@
 package edu.moravian.csci215.tic_tac_toe.game
 
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import edu.moravian.csci215.tic_tac_toe.PlayerType
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import androidx.compose.foundation.Image
-import androidx.compose.ui.layout.ContentScale
 import org.jetbrains.compose.resources.painterResource
 import tictactoe.composeapp.generated.resources.Res
 import tictactoe.composeapp.generated.resources.*
-import androidx.compose.foundation.clickable
-import org.jetbrains.compose.resources.stringResource
 
 /**
  * Main gameplay screen. This handles:
@@ -24,6 +23,7 @@ import org.jetbrains.compose.resources.stringResource
  * Player turns
  * AI delays
  * Error handling via snackbar
+ * Triggering game over navigation
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -33,6 +33,7 @@ fun GameScreen(
     p1Type: PlayerType,
     p2Type: PlayerType,
     showSnackbar: (String) -> Unit,
+    onGameOver: (Char?, Board) -> Unit,
 ) {
     val coroutineScope = rememberCoroutineScope()
 
@@ -54,6 +55,7 @@ fun GameScreen(
 
         GameBoard(
             board = board,
+            modifier = Modifier.fillMaxWidth(0.9f), // Scaled to 90% of screen width
             onCellClick = { r, c ->
 
                 if (isAiThinking) {
@@ -74,6 +76,21 @@ fun GameScreen(
                 }
             }
         )
+    }
+
+    // GAME OVER LOGIC
+    LaunchedEffect(board.isGameOver) {
+        if (board.isGameOver) {
+            // Brief pause so the user can see the final piece placed on the board
+            delay(500)
+
+            val winner = when {
+                board.hasWon('X') -> 'X'
+                board.hasWon('O') -> 'O'
+                else -> null // Tie
+            }
+            onGameOver(winner, board)
+        }
     }
 
     // AI LOGIC
@@ -109,9 +126,10 @@ fun GameScreen(
 fun GameBoard(
     board: Board,
     onCellClick: (Int, Int) -> Unit,
+    modifier: Modifier = Modifier
 ) {
     Box(
-        modifier = Modifier.size(400.dp),
+        modifier = modifier.aspectRatio(1f), // Forces the board to always be a perfect square
         contentAlignment = Alignment.Center
     ) {
 
@@ -125,20 +143,23 @@ fun GameBoard(
 
         // Overlay clickable grid
         Column(
-            verticalArrangement = Arrangement.SpaceBetween,
             modifier = Modifier
-                .fillMaxHeight()
-                .padding(vertical = 15.dp)
+                .fillMaxSize()
+                .padding(15.dp)
         ){
             for (r in 0..2) {
                 Row(
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    modifier = Modifier.fillMaxWidth()
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .weight(1f) // Distributes row heights evenly
                 ){
                     for (c in 0..2) {
                         BoardCell(
                             value = board[r, c],
-                            onClick = { onCellClick(r, c) }
+                            onClick = { onCellClick(r, c) },
+                            modifier = Modifier
+                                .fillMaxHeight()
+                                .weight(1f) // Distributes column widths evenly
                         )
                     }
                 }
@@ -154,10 +175,10 @@ fun GameBoard(
 fun BoardCell(
     value: Char,
     onClick: () -> Unit,
+    modifier: Modifier = Modifier
 ) {
     Box(
-        modifier = Modifier
-            .size(110.dp)
+        modifier = modifier
             .padding(4.dp)
             .clickable(onClick = onClick),
         contentAlignment = Alignment.Center
@@ -166,13 +187,13 @@ fun BoardCell(
             'X' -> Image(
                 painter = painterResource(Res.drawable.x),
                 contentDescription = "X",
-                modifier = Modifier.size(70.dp)
+                modifier = Modifier.fillMaxSize(0.7f) // Scales the X to take up 70% of the cell
             )
 
             'O' -> Image(
                 painter = painterResource(Res.drawable.o),
                 contentDescription = "O",
-                modifier = Modifier.size(70.dp)
+                modifier = Modifier.fillMaxSize(0.7f) // Scales the O to take up 70% of the cell
             )
         }
     }
