@@ -34,9 +34,20 @@ import tictactoe.composeapp.generated.resources.Res
 import tictactoe.composeapp.generated.resources.gameover_Text
 import tictactoe.composeapp.generated.resources.topBarNavText
 
+/**
+ * Represents the navigation route for the Welcome screen.
+ */
 @Serializable
 object WelcomeRoute
 
+/**
+ * Represents the navigation route for an active Game screen.
+ *
+ * @param p1Name Name of player 1.
+ * @param p2Name Name of player 2.
+ * @param p1Type Type of player 1 (HUMAN or AI).
+ * @param p2Type Type of player 2 (HUMAN or AI).
+ */
 @Serializable
 data class GameRoute(
     val p1Name: String,
@@ -45,6 +56,16 @@ data class GameRoute(
     val p2Type: PlayerType
 )
 
+/**
+ * Represents the navigation route for the Game Over screen.
+ *
+ * @param winnerName Name of the winning player. Null if the game is a tie.
+ * @param p1Name Name of player 1.
+ * @param p2Name Name of player 2.
+ * @param p1Type Type of player 1.
+ * @param p2Type Type of player 2.
+ * @param boardSnapshot Serialized string representing the final board state.
+ */
 @Serializable
 data class GameOverRoute(
     val winnerName: String?, // Null if it's a tie
@@ -52,9 +73,15 @@ data class GameOverRoute(
     val p2Name: String,
     val p1Type: PlayerType,
     val p2Type: PlayerType,
-    val boardSnapshot: String // Serialized board state
+    val boardSnapshot: String,
 )
 
+/**
+ * The main entry point for the Tic-Tac-Toe app.
+ *
+ * Sets up the navigation host, top app bar, snackbar for messages,
+ * and manages persistent score tracking between games.
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun App() {
@@ -95,8 +122,8 @@ fun App() {
                                                 p1Name = route.p1Name,
                                                 p2Name = route.p2Name,
                                                 p1Type = route.p1Type,
-                                                p2Type = route.p2Type
-                                            )
+                                                p2Type = route.p2Type,
+                                            ),
                                         ) {
                                             popUpTo<GameOverRoute> { inclusive = true }
                                         }
@@ -105,20 +132,20 @@ fun App() {
                                     // Normal back button behavior (e.g., leaving an active game)
                                     navController.navigateUp()
                                 }
-                            }) {
+                            },) {
                                 // Dynamic custom PNG back button!
                                 PlatformBackButtonIcon()
                             }
-                        }
+                        },
                     )
                 }
-            }
+            },
         ) { padding ->
 
             NavHost(
                 navController = navController,
                 startDestination = WelcomeRoute,
-                modifier = Modifier.padding(padding)
+                modifier = Modifier.padding(padding),
             ) {
 
                 // WELCOME SCREEN
@@ -134,14 +161,14 @@ fun App() {
                     WelcomeScreen(
                         onStartGame = { p1Name, p2Name, p1Type, p2Type ->
                             navController.navigate(
-                                GameRoute(p1Name, p2Name, p1Type, p2Type)
+                                GameRoute(p1Name, p2Name, p1Type, p2Type),
                             )
                         },
                         showSnackbar = { message ->
                             coroutineScope.launch {
                                 snackbarHostState.showSnackbar(message)
                             }
-                        }
+                        },
                     )
                 }
 
@@ -184,12 +211,12 @@ fun App() {
                                     p2Name = route.p2Name,
                                     p1Type = route.p1Type,
                                     p2Type = route.p2Type,
-                                    boardSnapshot = finalBoard.toStringRepresentation()
-                                )
+                                    boardSnapshot = finalBoard.toStringRepresentation(),
+                                ),
                             ) {
                                 popUpTo<GameRoute> { inclusive = true }
                             }
-                        }
+                        },
                     )
                 }
 
@@ -209,12 +236,12 @@ fun App() {
                                     p1Name = route.p1Name,
                                     p2Name = route.p2Name,
                                     p1Type = route.p1Type,
-                                    p2Type = route.p2Type
-                                )
+                                    p2Type = route.p2Type,
+                                ),
                             ) {
                                 popUpTo<GameOverRoute> { inclusive = true }
                             }
-                        }
+                        },
                     )
                 }
             }
